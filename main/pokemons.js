@@ -115,7 +115,7 @@ const closeMainCar = document.createElement("div");
 let carShop = JSON.parse(localStorage.getItem("Pokemons")) || [];
 let showBag = true;
 let showUnits = false;
-
+let unitsBuys = 0;
 body.appendChild(titlePokemon);
 body.appendChild(divContent);
 body.appendChild(iconBag);
@@ -160,7 +160,7 @@ closeMainCar.addEventListener("click", () => {
 
 iconBag.addEventListener("click", () => {
   showBag = false;
-  showUnits = true
+  showUnits = true;
   if (carShop.length > 0) {
     displayCar();
     return;
@@ -168,15 +168,21 @@ iconBag.addEventListener("click", () => {
 });
 
 const displayCar = () => {
+  let test = 0;
+  carShop.forEach((i) => {
+    test += i.cantidad;
+    return (unitsBuys = test);
+  });
+
   if (carShop.length < 1) {
     iconBag.classList.remove("bag");
     iconBag.classList.add("hidden");
-    return
+    return;
   }
   if (showBag === false && showUnits) {
     mainCar.style =
       "color:white;display:flex;flex-direction:column;align-items:center;justify-content:center;position:fixed;top:10px;right:10px; background-color:#07010ccb; border-radius:6px";
-    unitsPurchased.innerText = carShop.length;
+    unitsPurchased.innerText = unitsBuys;
     iconBag.classList.remove("bag");
     iconBag.classList.add("hidden");
     return;
@@ -197,7 +203,7 @@ const createCard = () => {
     name.innerText = pokemon.name;
     pokemon.cantidad = 1;
     imagen.src = pokemon.img;
-    pokemon.id = uuid();
+
     btn.id = uuid();
     divContent.appendChild(divCard);
     divCard.appendChild(name);
@@ -212,12 +218,18 @@ const createCard = () => {
     btn.innerText = "Comprar";
 
     btn.addEventListener("click", () => {
-      console.log(pokemon);
       mainCar.classList.add("shake-left");
       setTimeout(() => {
         mainCar.classList.remove("shake-left");
       }, 500);
-      carShop.unshift(pokemon);
+
+      let elementFound = carShop.find((item) => item.name === pokemon.name);
+      if (elementFound) {
+        elementFound.cantidad += 1;
+      } else {
+        carShop.unshift(pokemon);
+      }
+
       localStorage.setItem("Pokemons", JSON.stringify(carShop));
       displayCar();
     });
